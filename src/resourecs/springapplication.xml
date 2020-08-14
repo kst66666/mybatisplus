@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <import resource="classpath:spring-shiro.xml"></import>
+
+    <!-- 配置数据源 -->
+    <bean id="dateSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/company"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="huayu"></property>
+    </bean>
+
+    <!-- 配置sessionFactroy工场 -->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dateSource"></property>
+        <!-- 引mybatis配置文件 -->
+        <property name="configLocation" value="classpath:sqlmapconfig.xml"></property>
+        <property name="plugins">
+            <array>
+                <!-- 配置分页插件 -->
+                <bean id="paginationInterceptor" class="com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor"></bean>
+                <!-- 性能拦截器，兼打印sql，不建议在生产环境中配 -->
+                <bean id="performanceInterceptor" class="com.baomidou.mybatisplus.extension.plugins.PerformanceInterceptor"/>
+            </array>
+        </property>
+    </bean>
+
+    <!-- 开启mapper的注解扫描 -->
+    <bean id="scannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.huayu.ssm.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <!-- 配置事务 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 注入数据源 -->
+        <property name="dataSource" ref="dateSource"></property>
+    </bean>
+
+    <!-- 开启事务 -->
+    <tx:annotation-driven/>
+    <!-- 扫service包 -->
+    <context:component-scan base-package="com.huayu.ssm.service"></context:component-scan>
+</beans>

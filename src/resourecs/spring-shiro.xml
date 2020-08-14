@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 配置shiro过滤器 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- 必须要引shiro安全管理器 -->
+        <property name="securityManager" ref="securityManager"></property>
+        <!-- 如果没有通过安全验证 -->
+        <property name="loginUrl" value="/login.jsp"></property>
+
+        <property name="filterChainDefinitions">
+            <value>
+                /login.jsp = anon
+                /layuiHtml/* = authc
+                <!--/emp/**=perms[1004]--><!-- 用户必须拥有1004权限才可访问/emp/**这个路径 -->
+            </value>
+        </property>
+    </bean>
+
+    <!-- 配置Realm -->
+    <bean id="realmDemo" class="com.huayu.ssm.shiro.RealmDemo">
+        <!--密码加密匹配器-->
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <!-- 加密方式 -->
+                <property name="hashAlgorithmName" value="MD5"></property>
+                <!-- 加密次数 -->
+                <!--<property name="hashIterations" value="1024"></property>-->
+            </bean>
+        </property>
+    </bean>
+
+    <!-- 配饰shiro的安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="realmDemo"></property>
+    </bean>
+
+</beans>
