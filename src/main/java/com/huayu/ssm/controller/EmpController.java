@@ -65,6 +65,7 @@ public class EmpController {
         layUIData.setMsg("查询成功");
         layUIData.setCount((int)iPage.getTotal());
         layUIData.setData(iPage.getRecords());
+        System.out.println("查询成功");
         return layUIData;
     }
 
